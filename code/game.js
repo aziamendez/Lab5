@@ -247,7 +247,7 @@ Player.prototype.moveY = function(step, level, keys)
 
   if (obstacle == "lava")
   {
-    this.pos = new Vector(7, 2);
+    this.pos = new Vector(2, 2);
   }
 
   if (obstacle)
