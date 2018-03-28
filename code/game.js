@@ -259,7 +259,7 @@ Coin.prototype.act = function(step) {
   this.pos = this.basePos.plus(new Vector(0, wobblePos));
 };
 
-var moveSpeed = 8, moveDist = 0.07;
+var moveSpeed = 4, moveDist = 1.07;
 
 Queso.prototype.act = function(step) {
   this.move += step * moveSpeed;
@@ -325,9 +325,19 @@ Player.prototype.act = function(step, level, keys) {
     level.playerTouched(otherActor.type, otherActor);
 };
 
-Level.prototype.playerTouched = function(type, actor) {
-  if (type == "coin") {
-    this.actors = this.actors.filter(function(other) {
+Level.prototype.playerTouched = function(type, actor)
+{
+  if (type == "coin")
+  {
+    this.actors = this.actors.filter(function(other)
+    {
+      return other != actor;
+    });
+  }
+  if (type == "queso")
+  {
+    this.actors = this.actors.filter(function(other)
+    {
       return other != actor;
     });
   }
@@ -402,4 +412,3 @@ function runGame(plans, Display) {
   }
   startLevel(0);
 }
-
