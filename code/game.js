@@ -1,9 +1,11 @@
 // Map each class of actor to a character
-var actorChars = {
+var actorChars =
+{
   "@": Player,
   "o": Coin, // A coin will wobble up and down
   "q": Queso,
-  "=": Lava, "|": Lava, "v": Lava
+  "=": Lava, "|": Lava, "v": Lava,
+  "t": Teleport
 };
 
 function Level(plan) {
@@ -97,9 +99,20 @@ function Queso(pos) {
   this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
   this.size = new Vector(1.0, 1.0);
   // Make it go back and forth in a sine wave.
-  this.move = Math.random() * Math.PI * 2;
+  //this.move = Math.random() * Math.PI * 2;
+   this.move = Math.random();
 }
 Queso.prototype.type = "queso";
+
+function Teleport(pos) {
+  this.basePos = this.pos = pos.plus(new Vector(1, 1));
+  this.size = new Vector(0.6, 0.6);
+  // Make it go back and forth in a sine wave.
+  this.zap = Math.random() * Math.PI * 2;
+}
+Teleport.prototype.type = "teleport";
+
+//this.speed = new Vector(0, 3);
 
 // Lava is initialized based on the character, but otherwise has a
 // size and position
@@ -314,21 +327,18 @@ Queso.prototype.act = function(step) {
   this.pos = this.basePos.plus(new Vector(0, movePos));
 };
 
-var maxStep = 0.05;
+var zapSpeed = 8, zapDist = 0.07;
 
-var wobbleSpeed = 8, wobbleDist = 0.07;
-
-Coin.prototype.act = function(step) {
-  this.wobble += step * wobbleSpeed;
-  var wobblePos = Math.sin(this.wobble) * wobbleDist;
-  this.pos = this.basePos.plus(new Vector(0, wobblePos));
+Teleport.prototype.act = function(step) {
+  this.zap += step * zapSpeed;
+  var zapPos = Math.sin(this.zap) * zapDist;
+  this.pos = this.basePos.plus(new Vector(0, zapPos));
 };
-
-var maxStep = 0.05;
 
 var playerXSpeed = 7;
 
-Player.prototype.moveX = function(step, level, keys) {
+Player.prototype.moveX = function(step, level, keys)
+{
   this.speed.x = 0;
   if (keys.left) this.speed.x -= playerXSpeed;
   if (keys.right) this.speed.x += playerXSpeed;
@@ -347,7 +357,7 @@ Player.prototype.moveX = function(step, level, keys) {
 };
 
 var gravity = 46;
-var jumpSpeed = 17;
+var jumpSpeed = 20;
 var playerYSpeed = 35;
 
 Player.prototype.moveY = function(step, level, keys) {
@@ -359,10 +369,6 @@ Player.prototype.moveY = function(step, level, keys) {
   // The floor is also an obstacle -- only allow players to
   // jump if they are touching some obstacle.
 
-  if (obstacle == "lava")
-  {
-    this.pos = new Vector(1, 2)
-  };
 
   if (obstacle) {
     level.playerTouched(obstacle);
@@ -374,6 +380,7 @@ Player.prototype.moveY = function(step, level, keys) {
     this.pos = newPos;
   }
 };
+
 
 Player.prototype.act = function(step, level, keys) {
   this.moveX(step, level, keys);
@@ -416,6 +423,13 @@ Level.prototype.playerTouched = function(type, actor)
     }
   }
   if (type == "queso")
+  {
+    this.actors = this.actors.filter(function(other)
+    {
+      return other != actor;
+    });
+  }
+  if (type == "teleport")
   {
     this.actors = this.actors.filter(function(other)
     {
@@ -506,3 +520,4 @@ function runGame(plans, Display) {
   }
   startLevel(0);
 }
+
