@@ -8,7 +8,13 @@
 .floater  {background: rgb(153, 51, 102);}
 
 .actor  { position: absolute;  }
-.player { background: rgb(64, 64, 64); }
+.player { background: rgb(255, 255, 255); }
+.player { background: rgb(255, 255, 255); }
+.coin { background: rgb(241, 229, 89); }
+.queso { background: rgb(225,225,33); }
+.teleport { background: rgb(255,153,204);}
+.restart { background: rgb(25,25,33); }
+.lift { background: rbg(221, 130, 238)}
 
 .game {
   overflow: hidden;
@@ -16,3 +22,9 @@
   max-height: 450px;
   position: relative;
 }
+
+.lost .player {
+  background: rgb(160, 64, 64);
+}
+.won .player {
+  box-shadow: -4px -7px 8px white, 4px -7px 8px white;
