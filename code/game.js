@@ -4,8 +4,8 @@ var actorChars =
   "@": Player,
   "o": Coin, // A coin will wobble up and down
   "q": Queso,
-  "=": Lava, "|": Lava, "v": Lava,
-  "t": Teleport
+  "=": Lava, "|": Lava, "v": Lava
+  //"f": fish
 };
 
 function Level(plan) {
@@ -41,8 +41,12 @@ function Level(plan) {
       // Because there is a third case (space ' '), use an "else if" instead of "else"
       else if (ch == "!")
         fieldType = "lava";
+      else if (ch == "t")
+        fieldType = "teleport"
       else if (ch == "y")
         fieldType = "floater";
+      else if (ch == "r")
+        fieldType = "restart";
 
       // "Push" the fieldType, which is a string, onto the gridLine array (at the end).
       gridLine.push(fieldType);
@@ -104,15 +108,6 @@ function Queso(pos) {
 }
 Queso.prototype.type = "queso";
 
-function Teleport(pos) {
-  this.basePos = this.pos = pos.plus(new Vector(1, 1));
-  this.size = new Vector(0.6, 0.6);
-  // Make it go back and forth in a sine wave.
-  this.zap = Math.random() * Math.PI * 2;
-}
-Teleport.prototype.type = "teleport";
-
-//this.speed = new Vector(0, 3);
 
 // Lava is initialized based on the character, but otherwise has a
 // size and position
@@ -255,7 +250,7 @@ Level.prototype.obstacleAt = function(pos, size) {
   for (var y = yStart; y < yEnd; y++) {
     for (var x = xStart; x < xEnd; x++) {
       var fieldType = this.grid[y][x];
-      if (fieldType) return fieldType;
+      if (fieldType && fieldType != "floater") return fieldType;
     }
   }
 };
@@ -325,14 +320,6 @@ Queso.prototype.act = function(step) {
   this.move += step * moveSpeed;
   var movePos = Math.sin(this.move) * moveDist;
   this.pos = this.basePos.plus(new Vector(0, movePos));
-};
-
-var zapSpeed = 8, zapDist = 0.07;
-
-Teleport.prototype.act = function(step) {
-  this.zap += step * zapSpeed;
-  var zapPos = Math.sin(this.zap) * zapDist;
-  this.pos = this.basePos.plus(new Vector(0, zapPos));
 };
 
 var playerXSpeed = 7;
@@ -428,13 +415,29 @@ Level.prototype.playerTouched = function(type, actor)
     {
       return other != actor;
     });
+    //add player speed here
+    //this.player.queso++;
+    playerXSpeed = 15;
   }
-  if (type == "teleport")
+  if (type == "teleport" && this.status == null)
   {
     this.actors = this.actors.filter(function(other)
     {
       return other != actor;
     });
+    this.player.pos = new Vector(7, 2);
+  }
+
+  if (type == "restart")
+  {
+    this.actors = this.actors.filter(function(other)
+    {
+      return other != actor;
+    });
+    //this is a single block that's going to be the same color as the walls
+    //when the character starts a new level and lands on inspect
+    //the player's speed goes back to normal
+    playerXSpeed = 7;
   }
 };
 
@@ -518,6 +521,5 @@ function runGame(plans, Display) {
         console.log("You win!");
     });
   }
-  startLevel(0);
+  startLevel(1);
 }
-
