@@ -14,9 +14,9 @@
         background-size: 12px 12px;}
 .queso { background-image: url("image/queso.png");
         background-size: 20px 20px;}
-.teleport { background: rgb(255,153,204);}
+.teleport { background: rgb(51, 51, 51);}
 .portal { background: rgb(255,153,204);}
-.restart { background: rgb(25,25,33); }
+.restart { background: rgb(51, 51, 51); }
 .lift { background-image: url("image/fish.jpg");
         background-size: 20px 20px;}
 .fish { background-image: url("image/owl.gif");
@@ -34,3 +34,4 @@
 }
 .won .player {
   box-shadow: -4px -7px 8px gold, 4px -7px 8px gold;
+}
