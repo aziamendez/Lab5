@@ -4,7 +4,8 @@ var actorChars =
   "@": Player,
   "o": Coin, // A coin will wobble up and down
   "q": Queso,
-  "=": Lava, "|": Lava, "v": Lava
+  "=": Lava, "|": Lava, "v": Lava,
+  "l": Lift,
   //"f": fish
 };
 
@@ -104,9 +105,18 @@ function Queso(pos) {
   this.size = new Vector(1.0, 1.0);
   // Make it go back and forth in a sine wave.
   //this.move = Math.random() * Math.PI * 2;
-   this.move = Math.random();
+   this.wobble = Math.random() * Math.PI * 2;
 }
 Queso.prototype.type = "queso";
+
+function Lift(pos) {
+  this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
+  this.size = new Vector(1.0, 1.0);
+  // Make it go back and forth in a sine wave.
+  //this.move = Math.random() * Math.PI * 2;
+   this.rise = Math.random();
+}
+Lift.prototype.type = "lift";
 
 
 // Lava is initialized based on the character, but otherwise has a
@@ -322,6 +332,14 @@ Queso.prototype.act = function(step) {
   this.pos = this.basePos.plus(new Vector(0, movePos));
 };
 
+var riseSpeed = 4, riseDist = 1.07;
+
+Lift.prototype.act = function(step) {
+  this.rise += step * riseSpeed;
+  var risePos = Math.sin(this.rise) * riseDist;
+  this.pos = this.basePos.plus(new Vector(0, risePos));
+};
+
 var playerXSpeed = 7;
 
 Player.prototype.moveX = function(step, level, keys)
@@ -427,7 +445,6 @@ Level.prototype.playerTouched = function(type, actor)
     });
     this.player.pos = new Vector(7, 2);
   }
-
   if (type == "restart")
   {
     this.actors = this.actors.filter(function(other)
@@ -438,6 +455,14 @@ Level.prototype.playerTouched = function(type, actor)
     //when the character starts a new level and lands on inspect
     //the player's speed goes back to normal
     playerXSpeed = 7;
+  }
+  if (type == "lift")
+  {
+    this.actors = this.actors.filter(function(other)
+    {
+      return other != actor;
+    });
+    gravity = 15;
   }
 };
 
@@ -521,5 +546,5 @@ function runGame(plans, Display) {
         console.log("You win!");
     });
   }
-  startLevel(1);
+  startLevel(0);
 }
