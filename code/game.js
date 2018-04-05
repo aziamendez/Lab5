@@ -6,7 +6,7 @@ var actorChars =
   "q": Queso,
   "=": Lava, "|": Lava, "v": Lava,
   "l": Lift,
-  //"f": fish
+  "f": Fish
 };
 
 function Level(plan) {
@@ -48,6 +48,8 @@ function Level(plan) {
         fieldType = "floater";
       else if (ch == "r")
         fieldType = "restart";
+      else if (ch == "p")
+        fieldType = "portal"
 
       // "Push" the fieldType, which is a string, onto the gridLine array (at the end).
       gridLine.push(fieldType);
@@ -83,15 +85,17 @@ Vector.prototype.times = function(factor) {
 
 
 // A Player has a size, speed and position.
-function Player(pos) {
+function Player(pos)
+{
   this.pos = pos.plus(new Vector(0, -0.5));
-  this.size = new Vector(0.8, 1.5);
+  this.size = new Vector(1.5, 1.5);
   this.speed = new Vector(0, 0);
 }
 Player.prototype.type = "player";
 
 // Add a new actor type as a class
-function Coin(pos) {
+function Coin(pos)
+{
   this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
   this.size = new Vector(0.6, 0.6);
   // Make it go back and forth in a sine wave.
@@ -100,28 +104,39 @@ function Coin(pos) {
 Coin.prototype.type = "coin";
 
 // Add a new actor type as a class
-function Queso(pos) {
+function Queso(pos)
+{
   this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
-  this.size = new Vector(1.0, 1.0);
+  this.size = new Vector(1, 1);
   // Make it go back and forth in a sine wave.
-  //this.move = Math.random() * Math.PI * 2;
-   this.wobble = Math.random() * Math.PI * 2;
+  this.move = Math.random() * Math.PI * 2;
 }
 Queso.prototype.type = "queso";
 
-function Lift(pos) {
+function Lift(pos)
+{
   this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
   this.size = new Vector(1.0, 1.0);
   // Make it go back and forth in a sine wave.
-  //this.move = Math.random() * Math.PI * 2;
    this.rise = Math.random();
 }
 Lift.prototype.type = "lift";
 
+function Fish(pos)
+{
+  this.basePos = this.pos = pos.plus(new Vector(0.2, 0.1));
+  this.size = new Vector(2, 2);
+  // Make it go back and forth in a sine wave.
+  this.swim = Math.random() * Math.PI * 2;
+
+}
+Fish.prototype.type = "fish";
+
 
 // Lava is initialized based on the character, but otherwise has a
 // size and position
-function Lava(pos, ch) {
+function Lava(pos, ch)
+{
   this.pos = pos;
   this.size = new Vector(1, 1);
   if (ch == "=") {
@@ -146,7 +161,8 @@ function elt(name, className) {
 }
 
 // Main display class. We keep track of the scroll window using it.
-function DOMDisplay(parent, level) {
+function DOMDisplay(parent, level)
+{
 
 // this.wrap corresponds to a div created with class of "game"
   this.wrap = parent.appendChild(elt("div", "game"));
@@ -164,7 +180,8 @@ function DOMDisplay(parent, level) {
 
 var scale = 20;
 
-DOMDisplay.prototype.drawBackground = function() {
+DOMDisplay.prototype.drawBackground = function()
+{
   var table = elt("table", "background");
   table.style.width = this.level.width * scale + "px";
 
@@ -181,12 +198,14 @@ DOMDisplay.prototype.drawBackground = function() {
 };
 
 // All actors are above (in front of) background elements.
-DOMDisplay.prototype.drawActors = function() {
+DOMDisplay.prototype.drawActors = function()
+{
   // Create a new container div for actor dom elements
   var wrap = elt("div");
 
   // Create a new element for each actor each frame
-  this.level.actors.forEach(function(actor) {
+  this.level.actors.forEach(function(actor)
+  {
     var rect = wrap.appendChild(elt("div",
                                     "actor " + actor.type));
     rect.style.width = actor.size.x * scale + "px";
@@ -197,7 +216,8 @@ DOMDisplay.prototype.drawActors = function() {
   return wrap;
 };
 
-DOMDisplay.prototype.drawFrame = function() {
+DOMDisplay.prototype.drawFrame = function()
+{
   if (this.actorLayer)
     this.wrap.removeChild(this.actorLayer);
   this.actorLayer = this.wrap.appendChild(this.drawActors());
@@ -206,7 +226,8 @@ DOMDisplay.prototype.drawFrame = function() {
   this.scrollPlayerIntoView();
 };
 
-DOMDisplay.prototype.scrollPlayerIntoView = function() {
+DOMDisplay.prototype.scrollPlayerIntoView = function()
+{
   var width = this.wrap.clientWidth;
   var height = this.wrap.clientHeight;
 
@@ -234,12 +255,14 @@ DOMDisplay.prototype.scrollPlayerIntoView = function() {
 
 // Remove the wrap element when clearing the display
 // This will be garbage collected
-DOMDisplay.prototype.clear = function() {
+DOMDisplay.prototype.clear = function()
+{
   this.wrap.parentNode.removeChild(this.wrap);
 };
 
 // Return the first obstacle found given a size and position.
-Level.prototype.obstacleAt = function(pos, size) {
+Level.prototype.obstacleAt = function(pos, size)
+{
   // Find the "coordinate" of the tile representing left bound
   var xStart = Math.floor(pos.x);
   // right bound
@@ -257,8 +280,10 @@ Level.prototype.obstacleAt = function(pos, size) {
 
   // Check each grid position starting at yStart, xStart
   // for a possible obstacle (non null value)
-  for (var y = yStart; y < yEnd; y++) {
-    for (var x = xStart; x < xEnd; x++) {
+  for (var y = yStart; y < yEnd; y++)
+  {
+    for (var x = xStart; x < xEnd; x++)
+    {
       var fieldType = this.grid[y][x];
       if (fieldType && fieldType != "floater") return fieldType;
     }
@@ -267,10 +292,12 @@ Level.prototype.obstacleAt = function(pos, size) {
 
 // Collision detection for actors is handled separately from
 // tiles.
-Level.prototype.actorAt = function(actor) {
+Level.prototype.actorAt = function(actor)
+{
   // Loop over each actor in our actors list and compare the
   // boundary boxes for overlaps.
-  for (var i = 0; i < this.actors.length; i++) {
+  for (var i = 0; i < this.actors.length; i++)
+  {
     var other = this.actors[i];
     // if the other actor isn't the acting actor
     if (other != actor &&
@@ -285,7 +312,8 @@ Level.prototype.actorAt = function(actor) {
 };
 
 // Update simulation each step based on keys & step size
-Level.prototype.animate = function(step, keys) {
+Level.prototype.animate = function(step, keys)
+{
   // Have game continue past point of win or loss
   if (this.status != null)
     this.finishDelay -= step;
@@ -294,6 +322,7 @@ Level.prototype.animate = function(step, keys) {
   while (step > 0) {
     var thisStep = Math.min(step, maxStep);
     this.actors.forEach(function(actor) {
+
       // Allow each actor to act on their surroundings
       actor.act(thisStep, this, keys);
     }, this);
@@ -303,7 +332,8 @@ Level.prototype.animate = function(step, keys) {
   }
 };
 
-Lava.prototype.act = function(step, level) {
+Lava.prototype.act = function(step, level)
+{
   var newPos = this.pos.plus(this.speed.times(step));
   if (!level.obstacleAt(newPos, this.size))
     this.pos = newPos;
@@ -318,7 +348,8 @@ var maxStep = 0.05;
 
 var wobbleSpeed = 8, wobbleDist = 0.07;
 
-Coin.prototype.act = function(step) {
+Coin.prototype.act = function(step)
+{
   this.wobble += step * wobbleSpeed;
   var wobblePos = Math.sin(this.wobble) * wobbleDist;
   this.pos = this.basePos.plus(new Vector(0, wobblePos));
@@ -326,7 +357,8 @@ Coin.prototype.act = function(step) {
 
 var moveSpeed = 4, moveDist = 1.07;
 
-Queso.prototype.act = function(step) {
+Queso.prototype.act = function(step)
+{
   this.move += step * moveSpeed;
   var movePos = Math.sin(this.move) * moveDist;
   this.pos = this.basePos.plus(new Vector(0, movePos));
@@ -334,11 +366,22 @@ Queso.prototype.act = function(step) {
 
 var riseSpeed = 4, riseDist = 1.07;
 
-Lift.prototype.act = function(step) {
+Lift.prototype.act = function(step)
+{
   this.rise += step * riseSpeed;
   var risePos = Math.sin(this.rise) * riseDist;
   this.pos = this.basePos.plus(new Vector(0, risePos));
 };
+
+var swimSpeed = 1, swimDist = 10;
+
+Fish.prototype.act = function(step)
+{
+  this.swim += step * swimSpeed;
+  var swimPos = Math.sin(this.swim) * swimDist;
+  this.pos = this.basePos.plus(new Vector(swimPos, 0));
+};
+
 
 var playerXSpeed = 7;
 
@@ -365,7 +408,8 @@ var gravity = 46;
 var jumpSpeed = 20;
 var playerYSpeed = 35;
 
-Player.prototype.moveY = function(step, level, keys) {
+Player.prototype.moveY = function(step, level, keys)
+{
   // Accelerate player downward (always)
   this.speed.y += step * gravity;;
   var motion = new Vector(0, this.speed.y * step);
@@ -375,19 +419,22 @@ Player.prototype.moveY = function(step, level, keys) {
   // jump if they are touching some obstacle.
 
 
-  if (obstacle) {
+  if (obstacle)
+  {
     level.playerTouched(obstacle);
     if (keys.up && this.speed.y > 0)
       this.speed.y = -jumpSpeed;
     else
       this.speed.y = 0;
-  } else {
+  } else
+  {
     this.pos = newPos;
   }
 };
 
 
-Player.prototype.act = function(step, level, keys) {
+Player.prototype.act = function(step, level, keys)
+{
   this.moveX(step, level, keys);
   this.moveY(step, level, keys);
 
@@ -396,7 +443,8 @@ Player.prototype.act = function(step, level, keys) {
     level.playerTouched(otherActor.type, otherActor);
 
   // Losing animation
-  if (level.status == "lost") {
+  if (level.status == "lost")
+  {
     this.pos.y += step;
     this.size.y -= step;
   }
@@ -437,6 +485,7 @@ Level.prototype.playerTouched = function(type, actor)
     //this.player.queso++;
     playerXSpeed = 15;
   }
+
   if (type == "teleport" && this.status == null)
   {
     this.actors = this.actors.filter(function(other)
@@ -455,6 +504,7 @@ Level.prototype.playerTouched = function(type, actor)
     //when the character starts a new level and lands on inspect
     //the player's speed goes back to normal
     playerXSpeed = 7;
+    gravity = 46;
   }
   if (type == "lift")
   {
@@ -464,7 +514,18 @@ Level.prototype.playerTouched = function(type, actor)
     });
     gravity = 15;
   }
+
+  if (type == "portal" && this.status == null)
+  {
+    this.actors = this.actors.filter(function(other)
+    {
+      return other != actor;
+    });
+    this.player.pos = new Vector(30, 2);
+  }
+
 };
+
 
 // Arrow key codes for readibility
 var arrowCodes = {37: "left", 38: "up", 39: "right"};
