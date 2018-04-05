@@ -8,13 +8,19 @@
 .floater  {background: rgb(153, 51, 102);}
 
 .actor  { position: absolute;  }
-.player { background: rgb(255, 255, 255); }
-.player { background: rgb(255, 255, 255); }
-.coin { background: rgb(241, 229, 89); }
-.queso { background: rgb(225,225,33); }
+.player { background-image: url("image/ghostkitty.gif_c200");
+        background-size: 30px 30px; }
+.coin { background-image: url("image/coin.gif");
+        background-size: 12px 12px;}
+.queso { background-image: url("image/queso.png");
+        background-size: 20px 20px;}
 .teleport { background: rgb(255,153,204);}
+.portal { background: rgb(255,153,204);}
 .restart { background: rgb(25,25,33); }
-.lift { background: rbg(221, 130, 238)}
+.lift { background-image: url("image/fish.jpg");
+        background-size: 20px 20px;}
+.fish { background-image: url("image/owl.gif");
+        background-size: 40px 40px;}
 
 .game {
   overflow: hidden;
@@ -27,4 +33,4 @@
   background: rgb(160, 64, 64);
 }
 .won .player {
-  box-shadow: -4px -7px 8px white, 4px -7px 8px white;
+  box-shadow: -4px -7px 8px gold, 4px -7px 8px gold;
